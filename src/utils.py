@@ -1,17 +1,19 @@
 import os
-import keras.callbacks as callbacks 
+from tensorflow import keras
 import numpy as np
 import skimage.io as io 
 from utils import *
 from skimage import img_as_float
 
+
 def CheckAndCreate(path): 
     if not os.path.exists(path): 
         os.makedirs(path)
 
-class valImagesSaver(callbacks.Callback): 
+
+class valImagesSaver(keras.callbacks.Callback): 
     def __init__(self, dataDir, ext, outDir): 
-        callbacks.Callback.__init__(self)
+        keras.callbacks.Callback.__init__(self)
         self.min = np.inf
         self.dataDir = dataDir
         self.outDir = outDir
@@ -24,7 +26,7 @@ class valImagesSaver(callbacks.Callback):
 
     def on_epoch_end(self, epoch, logs): 
 
-        #If best validation model yet..
+        # If best validation model yet..
         if logs.get('val_loss') < self.min:
             self.min = logs.get('val_loss')
 
@@ -39,9 +41,10 @@ class valImagesSaver(callbacks.Callback):
 
                 io.imsave(outPath, ypreds[i,:,:,0])
 
+
 def writeConfigToFile(fpath, optsDict, model): 
     fobj = open(fpath, 'w')
 
-    for k,v in optsDict.items(): 
+    for k, v in optsDict.items():
         fobj.write('{} >> {}\n'.format(str(k), str(v)))
     fobj.close()

@@ -1,68 +1,69 @@
-#THIS FILE CONTAINS ALL THE MODEL ARCHITECTURES EXPERIMENTED WITH.. 
 
-import keras.layers as layers
-from keras.initializers import VarianceScaling
-from keras.models import Model, Sequential
-import itertools as iters
-from keras_contrib.layers.normalization import InstanceNormalization
+from joblib.numpy_pickle_utils import xrange
+from tensorflow import keras
+import keras_contrib
+import keras_contrib.layers
+
 
 def model_init(opts):
     """Simple sequential image-to-image convolutional neural network"""
     
-    init_fn = VarianceScaling(2.)
+    init_fn = keras.initializers.VarianceScaling(2.)
 
-    model = Sequential()
+    model = keras.models.Sequential()
     isFirst = True
-    for ks, nk, a in iters.izip(opts.kernelSizes, opts.numKernels, opts.activations): 
+    for ks, nk, a in zip(opts.kernelSizes, opts.numKernels, opts.activations):
 
         if isFirst:
-            model.add(layers.Conv2D(nk,kernel_size=ks,strides=opts.strides,padding=opts.padding,
+            model.add(keras.layers.Conv2D(nk, kernel_size=ks,strides=opts.strides,padding=opts.padding,
                                 kernel_initializer=init_fn, input_shape=opts.inputShape))
             isFirst = False
         else: 
-            model.add(layers.Conv2D(nk,kernel_size=ks,strides=opts.strides,padding=opts.padding,
+            model.add(keras.layers.Conv2D(nk, kernel_size=ks,strides=opts.strides,padding=opts.padding,
                                 kernel_initializer=init_fn))
 
         if opts.includeInsNormLayer: 
-            model.add(InstanceNormalization(axis=opts.insNormAxis))
+            model.add(keras_contrib.layers.InstanceNormalization(axis=opts.insNormAxis))
 
-        model.add(layers.Activation(a))
+        model.add(keras.layers.Activation(a))
         if opts.dropRate > 0.0: 
-            model.add(layers.Dropout(rate=opts.dropRate))
+            model.add(keras.layers.Dropout(rate=opts.dropRate))
     return model
 
+
 def model_unet(opts): 
-    init_fn = VarianceScaling(2.)
-    model_input = layers.Input(shape=opts.inputShape)
+    init_fn = keras.initializers.VarianceScaling(2.)
+    model_input = keras.layers.Input(shape=opts.inputShape)
     prev = model_input
     scaleSpace = []
 
-    #downsampling path
+    # downsampling path
     for i in xrange(opts.numScales): 
-        out = layers.Conv2D(filters=opts.numKernels, kernel_size=opts.kernelSizes, strides=opts.strides, padding='same',
+        out = keras.layers.Conv2D(filters=opts.numKernels, kernel_size=opts.kernelSizes, strides=opts.strides, padding='same',
                     kernel_initializer=init_fn,activation=opts.activations)(prev)
         scaleSpace.append(out)
         
-        prev = layers.MaxPool2D(pool_size=opts.poolSize, strides=opts.poolStrides, padding=opts.poolPadding)(out)
+        prev = keras.layers.MaxPool2D(pool_size=opts.poolSize, strides=opts.poolStrides, padding=opts.poolPadding)(out)
 
-    #base case
-    prev = layers.Conv2D(filters=opts.numKernels, kernel_size=opts.kernelSizes, strides=opts.strides, padding='same',
+    # base case
+    prev = keras.layers.Conv2D(filters=opts.numKernels, kernel_size=opts.kernelSizes, strides=opts.strides, padding='same',
                         kernel_initializer=init_fn,activation=opts.activations)(prev)
     
-    #upsampling path
+    # upsampling path
     for i in xrange(opts.numScales): 
-        out = layers.Conv2DTranspose(filters=opts.numKernels,kernel_size=opts.kernelSizes, strides=2, padding='same',
+        out = keras.layers.Conv2DTranspose(filters=opts.numKernels,kernel_size=opts.kernelSizes, strides=2, padding='same',
                                     kernel_initializer=init_fn,)(prev)
  
-        out = layers.concatenate(inputs=[out, scaleSpace[-1-i]], axis=-1)
-        prev = layers.Conv2D(filters=opts.numKernels, kernel_size=opts.kernelSizes, strides=opts.strides, padding='same',
+        out = keras.layers.concatenate(inputs=[out, scaleSpace[-1-i]], axis=-1)
+        prev = keras.layers.Conv2D(filters=opts.numKernels, kernel_size=opts.kernelSizes, strides=opts.strides, padding='same',
                     kernel_initializer=init_fn,activation=opts.activations)(out)
     
-    model_output = layers.Conv2D(filters=1, kernel_size=opts.kernelSizes, strides=opts.strides, padding='same',
+    model_output = keras.layers.Conv2D(filters=1, kernel_size=opts.kernelSizes, strides=opts.strides, padding='same',
                     kernel_initializer=init_fn,activation='sigmoid')(prev)
 
-    model = Model(inputs=(model_input,), outputs=(model_output,))
+    model = keras.models.Model(inputs=(model_input,), outputs=(model_output,))
     return model
+
 
 models_dict = dict()
 models_dict['imageToImageSeq'] = model_init

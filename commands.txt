@@ -1,0 +1,11 @@
+
+-- generate random images with lines into generated folder --
+-- but should add noNoise folder and put all other data into it --
+
+python generate_dataset.py -outDir ./generated
+
+
+
+-- test generated images from generated folder and save them into generated_output folder --
+
+python test.py -dataDir ./generated -outRootDir ./generated_output
