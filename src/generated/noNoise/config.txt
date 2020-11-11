@@ -1,0 +1,6 @@
+outDir >> ./generated
+numImgs >> 10
+imgSize >> 512
+maxNumLines >> 10
+maxNumOthers >> 5
+printEvery >> 1000

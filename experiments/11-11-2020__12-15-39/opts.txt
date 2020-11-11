@@ -1,0 +1,31 @@
+dataDir >> ./generated
+dataType >> noNoise
+ext >> ['png', 'jpg']
+generatorType >> generator_full_image
+inputShape >> (512, 512, 1)
+netType >> imageToImageSeq
+loadModel >> None
+dropRate >> 0.0
+kernelSizes >> [3, 3]
+numKernels >> [16, 16]
+activations >> ['relu', 'sigmoid']
+padding >> same
+strides >> 1
+includeInsNormLayer >> False
+insNormAxis >> None
+numScales >> 3
+poolSize >> 2
+poolStrides >> 2
+poolPadding >> valid
+optimizerType >> adam
+learningRate >> 0.001
+lrDecay >> 0.0
+numEpochs >> 1
+verbosity >> 1
+batchSize >> 16
+lossType >> weightedBinaryCrossEntropy
+epsilon >> 1e-06
+logRootDir >> ../experiments/
+logDir >> 11-11-2020__12-15-39
+logPerEpoch >> 1
+expDir >> ../experiments/11-11-2020__12-15-39

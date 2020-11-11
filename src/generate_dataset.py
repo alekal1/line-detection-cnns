@@ -32,7 +32,10 @@ def AddOthers(X, maxNumOthers, imgSize):
         c = int(c*2)
         idx = draw.circle_perimeter(r, c, radius, shape=imgSize)
         X[idx] = 1.
+        start, extent = np.random.randint(0, imgSize[1]/2, size=2)
 
+        idy = draw.rectangle_perimeter((start, start), extent=(extent, extent/2), shape=imgSize)
+        X[idy] = 1.
     return
 
 

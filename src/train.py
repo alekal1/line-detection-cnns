@@ -50,7 +50,7 @@ def train(opts):
 	if not os.path.exists(opts.expDir): 
 		os.makedirs(opts.expDir)
 		writeConfigToFile(os.path.join(opts.expDir,'opts.txt'), vars(opts), model)
-		keras.utils.plot_model(model, to_file=os.path.join(opts.expDir,'network.png'), show_layer_names=False)
+		# keras.utils.plot_model(model, to_file=os.path.join(opts.expDir,'network.png'), show_layer_names=False)
 	
 	#Configuring callbacks..
 	os.makedirs(os.path.join(opts.expDir, 'model'))
@@ -221,22 +221,22 @@ def generator_full_image(directory, ext, batch_size, preprocessing=None, mode='t
 
 			# picking a batch..
 			pathnamesX_batch = pathnamesX[idx[i:i + batch_size]]
-			pathnamesY_batch = pathnamesY[idx[i:i + batch_size]]
+			# pathnamesY_batch = pathnamesY[idx[i:i + batch_size]]
 
 			imagesX = io.ImageCollection(pathnamesX_batch)
-			imagesY = io.ImageCollection(pathnamesY_batch)
+			# imagesY = io.ImageCollection(pathnamesY_batch)
 
 			# optionally applying preporcessing to each batch
-			if preprocessing is not None:
-				imagesX, imagesY = preprocessing(imagesX, imagesY)
+			# if preprocessing is not None:
+				# imagesX, imagesY = preprocessing(imagesX, imagesY)
 
 			imagesX = io.concatenate_images(imagesX)
-			imagesY = io.concatenate_images(imagesY)
+			# imagesY = io.concatenate_images(imagesY)
 
 			imagesX = img_as_float(imagesX[:, :, :, np.newaxis])
-			imagesY = img_as_float(imagesY[:, :, :, np.newaxis]).astype(bool)
+			# imagesY = img_as_float(imagesY[:, :, :, np.newaxis]).astype(bool)
 
-			yield imagesX, imagesY
+			yield imagesX # imagesY
 
 
 generators_dict = dict()
